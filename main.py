@@ -78,7 +78,7 @@ class AZNet(hk.Module):
         self.resnet_cls = BlockV2
 
     def __call__(self, x, is_training, test_local_stats):
-        if config.env_id == "kuhn_poker" or "leduc_holdem":
+        if config.env_id == "kuhn_poker" or config.env_id == "leduc_holdem":
             x = x.reshape((x.shape[0], x.shape[1], 1))
         x = x.astype(jnp.float32)
         x = hk.Conv2D(self.num_channels, kernel_shape=2)(x)
