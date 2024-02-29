@@ -36,7 +36,6 @@ class Config(BaseModel):
     max_num_steps: int = 256
     # training params
     training_batch_size: int = 4096
-    learning_rate: float = 0.001
     # eval params
     eval_interval: int = 5
 
@@ -134,11 +133,27 @@ optimizer = optax.adam(learning_rate=config.learning_rate)
 def recurrent_fn(model, rng_key: jnp.ndarray, action: jnp.ndarray, state: pgx.State):
     # model: params
     # state: embedding
-    del rng_key
+    if config.env_id not in (
+        "minatar-asterix_v0",
+        "minatar-breakout_v0",
+        "minatar-freeway_v0",
+        "minatar-seaquest_v0",
+        "minatar-space_invaders_v0",
+    ):
+        del rng_key
+    if config.env_id in (
+        "minatar-asterix_v0",
+        "minatar-breakout_v0",
+        "minatar-freeway_v0",
+        "minatar-seaquest_v0",
+        "minatar-space_invaders_v0",
+    ):
+        step_fn = jax.vmap(env.step)
+        keys = jax.random.split(rng_key, state.observation.shape[0])
     model_params, model_state = model
 
     current_player = state.current_player
-    state = jax.vmap(env.step)(state, action)
+    state = step_fn(state, action, keys)
 
     (logits, value), _ = forward.apply(model_params, model_state, state.observation, is_eval=True)
     # mask invalid actions
@@ -171,7 +186,6 @@ class SelfplayOutput(NamedTuple):
 def selfplay(model, rng_key: jnp.ndarray) -> SelfplayOutput:
     model_params, model_state = model
     batch_size = config.selfplay_batch_size // num_devices
-
     def step_fn(state, key) -> SelfplayOutput:
         key1, key2 = jax.random.split(key)
         observation = state.observation
@@ -282,7 +296,14 @@ def evaluate(rng_key, my_model):
     Please use MCTS and run tournaments for serious evaluation."""
     my_player = 0
     my_model_parmas, my_model_state = my_model
-
+    if config.env_id in (
+        "minatar-asterix_v0",
+        "minatar-breakout_v0",
+        "minatar-freeway_v0",
+        "minatar-seaquest_v0",
+        "minatar-space_invaders_v0",
+    ):
+        step_fn = jax.vmap(env.step)
     key, subkey = jax.random.split(rng_key)
     batch_size = config.selfplay_batch_size // num_devices
     keys = jax.random.split(subkey, batch_size)
@@ -301,7 +322,17 @@ def evaluate(rng_key, my_model):
         logits = jnp.where(is_my_turn, my_logits, opp_logits)
         key, subkey = jax.random.split(key)
         action = jax.random.categorical(subkey, logits, axis=-1)
-        state = jax.vmap(env.step)(state, action)
+        if config.env_id in (
+            "minatar-asterix_v0",
+            "minatar-breakout_v0",
+            "minatar-freeway_v0",
+            "minatar-seaquest_v0",
+            "minatar-space_invaders_v0",
+        ):
+            keys = jax.random.split(subkey, state.observation.shape[0])
+            state = step_fn(state, action, keys)
+        else:
+            state = jax.vmap(env.step)(state, action)
         R = R + state.rewards[jnp.arange(batch_size), my_player]
         return (key, state, R)
 
