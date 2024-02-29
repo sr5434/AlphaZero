@@ -31,11 +31,16 @@ class Config(BaseModel):
     num_layers: int = 6
     resnet_v2: bool = True
     # selfplay params
-    selfplay_batch_size: int = 8
-    num_simulations: int = 2
-    max_num_steps: int = 4
+    #Testing
+    #selfplay_batch_size: int = 8
+    #num_simulations: int = 2
+    #max_num_steps: int = 4
+    selfplay_batch_size: int = 4096
+    num_simulations: int = 32
+    max_num_steps: int = 256
     # training params
     training_batch_size: int = 4096
+    #training_batch_size: int = 8#Testing only
     learning_rate: float = 0.001
     # eval params
     eval_interval: int = 5
@@ -135,19 +140,19 @@ def recurrent_fn(model, rng_key: jnp.ndarray, action: jnp.ndarray, state: pgx.St
     # model: params
     # state: embedding
     if config.env_id not in (
-        "minatar-asterix_v0",
-        "minatar-breakout_v0",
-        "minatar-freeway_v0",
-        "minatar-seaquest_v0",
-        "minatar-space_invaders_v0",
+        "minatar-asterix",
+        "minatar-breakout",
+        "minatar-freeway",
+        "minatar-seaquest",
+        "minatar-space_invaders",
     ):
         del rng_key
     if config.env_id in (
-        "minatar-asterix_v0",
-        "minatar-breakout_v0",
-        "minatar-freeway_v0",
-        "minatar-seaquest_v0",
-        "minatar-space_invaders_v0",
+        "minatar-asterix",
+        "minatar-breakout",
+        "minatar-freeway",
+        "minatar-seaquest",
+        "minatar-space_invaders",
     ):
         step_fn = jax.vmap(env.step)
         keys = jax.random.split(rng_key, state.observation.shape[0])
@@ -298,11 +303,11 @@ def evaluate(rng_key, my_model):
     my_player = 0
     my_model_parmas, my_model_state = my_model
     if config.env_id in (
-        "minatar-asterix_v0",
-        "minatar-breakout_v0",
-        "minatar-freeway_v0",
-        "minatar-seaquest_v0",
-        "minatar-space_invaders_v0",
+        "minatar-asterix",
+        "minatar-breakout",
+        "minatar-freeway",
+        "minatar-seaquest",
+        "minatar-space_invaders",
     ):
         step_fn = jax.vmap(env.step)
     key, subkey = jax.random.split(rng_key)
@@ -324,11 +329,11 @@ def evaluate(rng_key, my_model):
         key, subkey = jax.random.split(key)
         action = jax.random.categorical(subkey, logits, axis=-1)
         if config.env_id in (
-            "minatar-asterix_v0",
-            "minatar-breakout_v0",
-            "minatar-freeway_v0",
-            "minatar-seaquest_v0",
-            "minatar-space_invaders_v0",
+            "minatar-asterix",
+            "minatar-breakout",
+            "minatar-freeway",
+            "minatar-seaquest",
+            "minatar-space_invaders",
         ):
             keys = jax.random.split(subkey, state.observation.shape[0])
             state = step_fn(state, action, keys)
