@@ -3,3 +3,5 @@ pgx
 pydantic
 dm-haiku
 mctx
+muax
+gym_trading_env
