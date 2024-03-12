@@ -145,6 +145,7 @@ def recurrent_fn(model, rng_key: jnp.ndarray, action: jnp.ndarray, state: pgx.St
         "minatar-freeway",
         "minatar-seaquest",
         "minatar-space_invaders",
+        "2048"
     ):
         del rng_key
     if config.env_id in (
@@ -153,6 +154,7 @@ def recurrent_fn(model, rng_key: jnp.ndarray, action: jnp.ndarray, state: pgx.St
         "minatar-freeway",
         "minatar-seaquest",
         "minatar-space_invaders",
+        "2048"
     ):
         step_fn = jax.vmap(env.step)
         keys = jax.random.split(rng_key, state.observation.shape[0])
@@ -316,6 +318,7 @@ def evaluate(rng_key, my_model):
         "minatar-freeway",
         "minatar-seaquest",
         "minatar-space_invaders",
+        "2048"
     ):
         step_fn = jax.vmap(env.step)
     key, subkey = jax.random.split(rng_key)
@@ -342,6 +345,7 @@ def evaluate(rng_key, my_model):
             "minatar-freeway",
             "minatar-seaquest",
             "minatar-space_invaders",
+            "2048"
         ):
             keys = jax.random.split(subkey, state.observation.shape[0])
             state = step_fn(state, action, keys)
