@@ -25,22 +25,18 @@ from tqdm import tqdm
 class Config(BaseModel):
     env_id: pgx.EnvId = input("envId:")
     seed: int = 0
-    max_num_iters: int = 50000
+    max_num_iters: int = 1
     # network params
     num_channels: int = 128
     num_layers: int = 6
     resnet_v2: bool = True
     # selfplay params
     #Testing
-    #selfplay_batch_size: int = 8
-    #num_simulations: int = 2
-    #max_num_steps: int = 4
     selfplay_batch_size: int = 1028
     num_simulations: int = 32
     max_num_steps: int = 256
     # training params
     training_batch_size: int = 4096
-    #training_batch_size: int = 8#Testing only
     learning_rate: float = 0.001
     # eval params
     eval_interval: int = 5
@@ -119,7 +115,7 @@ devices = jax.local_devices()
 num_devices = len(devices)
 
 env = pgx.make(config.env_id)
-baseline = pgx.make_baseline_model(config.env_id + "_v0")
+#baseline = pgx.make_baseline_model(config.env_id + "_v0")
 
 
 def forward_fn(x, is_eval=False):
@@ -167,6 +163,7 @@ def recurrent_fn(model, rng_key: jnp.ndarray, action: jnp.ndarray, state: pgx.St
         "minatar-freeway",
         "minatar-seaquest",
         "minatar-space_invaders",
+        "2048"
     ):
         state = step_fn(state, action, keys)
     else:
@@ -331,10 +328,10 @@ def evaluate(rng_key, my_model):
         (my_logits, _), _ = forward.apply(
             my_model_parmas, my_model_state, state.observation, is_eval=True
         )
-        opp_logits, _ = baseline(state.observation)
-        #(opp_logits, _), _ = forward.apply(
-        #    my_model_parmas, my_model_state, state.observation, is_eval=True
-        #)
+        #opp_logits, _ = baseline(state.observation)
+        (opp_logits, _), _ = forward.apply(
+            my_model_parmas, my_model_state, state.observation, is_eval=True
+        )
         is_my_turn = (state.current_player == my_player).reshape((-1, 1))
         logits = jnp.where(is_my_turn, my_logits, opp_logits)
         key, subkey = jax.random.split(key)
