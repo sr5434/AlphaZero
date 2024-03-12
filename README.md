@@ -3,7 +3,9 @@ Implementing the AlphaZero algorithm(albeit with the MuZero Gumbel policy) for m
 Scripts:
  - ```main.py```: AlphaZero for games(Atari, Go, Poker, etc.)
  - ```muzero_trading.py```: MuZero for BTC trading(with Muax)
+ - ```test.py```: Test the trained Bitcoin Trader Bot
+ - ```test_model.py```: Test the games models(i.e. Kuhn Poker)
 
 
-Checkpoints:
+Checkpoints(more coming soon):
  - [Kuhn Poker](https://huggingface.co/sr5434/AlphaZero-Kuhn-Poker)
