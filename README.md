@@ -9,3 +9,4 @@ Scripts:
 
 Checkpoints(more coming soon):
  - [Kuhn Poker](https://huggingface.co/sr5434/AlphaZero-Kuhn-Poker)
+ - [Othello(Work in progress)](http://huggingface.co/sr5434/alphazero-othello)
