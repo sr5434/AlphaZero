@@ -10,5 +10,7 @@ Checkpoints(more coming soon):
  - [Othello/Reversi(Work in progress)](http://huggingface.co/sr5434/alphazero-othello)
 
 Othello model plays itself(step 15145):
+
+
 ![AI plays itself in game of Othello](./game.svg)
 <img src="./game.svg">
