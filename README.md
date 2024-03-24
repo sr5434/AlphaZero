@@ -13,4 +13,4 @@ Othello model plays itself(step 15145):
 
 
 ![AI plays itself in game of Othello](./game.svg)
-<img src="./game.svg">
+
